@@ -2,8 +2,14 @@ package com.tamrakar.uguess.bakingapp.views;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -21,25 +27,28 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.tamrakar.uguess.bakingapp.R;
+import com.tamrakar.uguess.bakingapp.adapters.RecipeIngredientsAdapter;
+import com.tamrakar.uguess.bakingapp.adapters.RecipeStepsAdapter;
+import com.tamrakar.uguess.bakingapp.models.Recipe;
 import com.tamrakar.uguess.bakingapp.models.RecipeStep;
 
-public class RecipeStepDetailActivity extends AppCompatActivity {
+public class RecipeStepDetailFragment extends Fragment {
 
-    private static String SELECTED_RECIPE_STEP = "selected_recipe_step";
-
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_step_detail);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail,
+                container, false);
 
-        // get Recipe step as parcelable
-        RecipeStep recipeStep = getIntent().getParcelableExtra(SELECTED_RECIPE_STEP);
+        RecipeStep recipeStep = getArguments().getParcelable(RecipeStepsAdapter.SELECTED_RECIPE_STEP);
 
-        SimpleExoPlayerView exoPlayerViewRecipeStep = findViewById(R.id.exo_player_recipe_step);
+        SimpleExoPlayerView exoPlayerViewRecipeStep = rootView.findViewById(R.id.exo_player_recipe_step);
 
         // Text view is only available in portrait mode
         TextView tvRecipeStepInstruction = null;
-        tvRecipeStepInstruction = findViewById(R.id.tv_recipe_step_instruction);
+        tvRecipeStepInstruction = rootView.findViewById(R.id.tv_recipe_step_instruction);
 
         // get the required data
         String recipeThumbnailUrl = recipeStep.getThumbnailUrl();
@@ -58,7 +67,7 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         TrackSelector trackSelector = new DefaultTrackSelector(
                 new AdaptiveVideoTrackSelection.Factory(new DefaultBandwidthMeter()));
         SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(
-                this, trackSelector, new DefaultLoadControl());
+                getActivity(), trackSelector, new DefaultLoadControl());
 
         // Set exo player to view
         exoPlayerViewRecipeStep.setPlayer(exoPlayer);
@@ -66,8 +75,8 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
         // Prepare source and player
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
-                this,
-                Util.getUserAgent(this, "Baking Time"),
+                getActivity(),
+                Util.getUserAgent(getActivity(), "Baking Time"),
                 bandwidthMeter);
         MediaSource videoSource = new ExtractorMediaSource(
                 Uri.parse(videoUrl),
@@ -76,5 +85,7 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
                 null,
                 null);
         exoPlayer.prepare(videoSource);
+
+        return rootView;
     }
 }

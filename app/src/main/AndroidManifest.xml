@@ -20,12 +20,29 @@
         </activity>
         <activity
             android:name=".views.RecipeDetailActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".views.MainActivity"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".views.RecipeStepDetailActivity"
+            android:name=".views.RecipeIngredientsActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".views.RecipeDetailActivity"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".views.RecipeStepDetailActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".views.RecipeDetailActivity"
+            android:theme="@style/AppTheme" />
+
+        <receiver android:name=".BakingAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/baking_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
