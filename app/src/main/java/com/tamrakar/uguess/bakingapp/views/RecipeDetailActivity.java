@@ -70,6 +70,12 @@ public class RecipeDetailActivity
                                 .commit();
                     }
                 });
+
+                // Call OnClick on Recipe Ingredients text view if its two pane
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                    tvRecipeIngredients.callOnClick();
+                }
+
             } else {
                 tvRecipeIngredients.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -80,10 +86,6 @@ public class RecipeDetailActivity
                         startActivity(intent);
                     }
                 });
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                tvRecipeIngredients.callOnClick();
             }
         }
     }

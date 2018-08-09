@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.tamrakar.uguess.bakingapp.R;
 import com.tamrakar.uguess.bakingapp.models.Recipe;
 import com.tamrakar.uguess.bakingapp.views.RecipeDetailActivity;
+import com.tamrakar.uguess.bakingapp.widget.BakingAppWidgetIntentService;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, RecipeDetailActivity.class);
                 intent.putExtra(SELECTED_RECIPE, recipe);
+                BakingAppWidgetIntentService.updateWidgets(mContext, recipe);
                 mContext.startActivity(intent);
             }
         });

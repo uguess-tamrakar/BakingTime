@@ -1,5 +1,6 @@
 package com.tamrakar.uguess.bakingapp.adapters;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Movie;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.tamrakar.uguess.bakingapp.R;
 import com.tamrakar.uguess.bakingapp.models.Recipe;
 import com.tamrakar.uguess.bakingapp.views.RecipeDetailActivity;
+import com.tamrakar.uguess.bakingapp.widget.BakingAppWidgetIntentService;
 
 import java.util.List;
 
@@ -46,6 +48,10 @@ public class RecipesGridAdapter extends ArrayAdapter<Recipe> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // update the widgets and send the recipe info to display its name and ingredients
+                BakingAppWidgetIntentService.updateWidgets(mContext, recipe);
+
+                // put selected recipe and IS_TWO_PANE in intent and start RecipeDetailActivity
                 Intent intent = new Intent(mContext, RecipeDetailActivity.class);
                 intent.putExtra(RecipeDetailActivity.SELECTED_RECIPE, recipe);
                 intent.putExtra(RecipeDetailActivity.IS_TWO_PANE, true);

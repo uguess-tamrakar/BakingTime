@@ -13,7 +13,7 @@ import com.tamrakar.uguess.bakingapp.models.Recipe;
 public class RecipeIngredientsActivity extends AppCompatActivity {
 
     private Recipe mRecipe;
-    private static final String RECIPE_KEY = "recipe";
+    public static final String RECIPE_KEY = "recipe";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -9,14 +9,15 @@
         android:id="@+id/exo_player_recipe_step"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:layout_marginTop="10dp"
         android:focusable="true" />
 
     <TextView
         android:id="@+id/tv_recipe_step_instruction"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
         android:layout_marginTop="3dp"
         android:background="@color/colorBackground"
         android:fontFamily="sans-serif-condensed"

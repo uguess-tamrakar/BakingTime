@@ -82,7 +82,8 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
 
         ViewHolder(View view) {
             super(view);
-            mTvRecipeStepShortDescription = view.findViewById(R.id.tv_recipe_step_short_description);
+            mTvRecipeStepShortDescription =
+                    view.findViewById(R.id.tv_recipe_step_short_description);
         }
     }
 }
