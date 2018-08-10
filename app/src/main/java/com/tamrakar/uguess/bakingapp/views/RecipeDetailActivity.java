@@ -10,14 +10,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tamrakar.uguess.bakingapp.R;
-import com.tamrakar.uguess.bakingapp.adapters.RecipeIngredientsAdapter;
 import com.tamrakar.uguess.bakingapp.adapters.RecipeStepsAdapter;
 import com.tamrakar.uguess.bakingapp.models.Recipe;
 
 public class RecipeDetailActivity
         extends AppCompatActivity {
 
-    public static final String IS_TWO_PANE = "is_two_pane";
+    public static final String IS_PHONE = "is_phone";
     public static final String SELECTED_RECIPE = "selected_recipe";
     public static final String RECIPE_KEY = "recipe";
     private Recipe mRecipe;
@@ -34,7 +33,7 @@ public class RecipeDetailActivity
         }
 
         // Check to see if it is two pane; if yes, then setup master detail flow layout
-        boolean isTwoPane = getIntent().getBooleanExtra(IS_TWO_PANE, false);
+        boolean isPhone = getIntent().getBooleanExtra(IS_PHONE, false);
 
         setContentView(R.layout.activity_recipe_detail);
 
@@ -47,16 +46,26 @@ public class RecipeDetailActivity
             TextView tvRecipeIngredients = findViewById(R.id.tv_recipe_ingredients);
 
             // set linear layout manager for recycler views
-            LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this);
-            linearLayoutManager1.setOrientation(LinearLayoutManager.VERTICAL);
-            rvRecipeSteps.setLayoutManager(linearLayoutManager1);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            rvRecipeSteps.setLayoutManager(linearLayoutManager);
 
             // set adapters for recycler views
             RecipeStepsAdapter recipeStepsAdapter =
-                    new RecipeStepsAdapter(this, mRecipe.getRecipeSteps(), isTwoPane);
+                    new RecipeStepsAdapter(this, mRecipe.getRecipeSteps(), isPhone);
             rvRecipeSteps.setAdapter(recipeStepsAdapter);
 
-            if (isTwoPane) {
+            if (isPhone) {
+                tvRecipeIngredients.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(v.getContext(),
+                                RecipeIngredientsActivity.class);
+                        intent.putExtra(RECIPE_KEY, mRecipe);
+                        startActivity(intent);
+                    }
+                });
+            } else {
                 // Set click listener on recipe ingredient text view
                 tvRecipeIngredients.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -75,17 +84,6 @@ public class RecipeDetailActivity
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     tvRecipeIngredients.callOnClick();
                 }
-
-            } else {
-                tvRecipeIngredients.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(v.getContext(),
-                                RecipeIngredientsActivity.class);
-                        intent.putExtra(RECIPE_KEY, mRecipe);
-                        startActivity(intent);
-                    }
-                });
             }
         }
     }

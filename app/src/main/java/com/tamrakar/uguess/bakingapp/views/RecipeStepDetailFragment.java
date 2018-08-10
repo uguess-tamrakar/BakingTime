@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +25,22 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.tamrakar.uguess.bakingapp.R;
-import com.tamrakar.uguess.bakingapp.adapters.RecipeIngredientsAdapter;
 import com.tamrakar.uguess.bakingapp.adapters.RecipeStepsAdapter;
-import com.tamrakar.uguess.bakingapp.models.Recipe;
 import com.tamrakar.uguess.bakingapp.models.RecipeStep;
 
 public class RecipeStepDetailFragment extends Fragment {
+
+    private boolean mAutoPlay;
+    private int mCurrentWindowIndex;
+    private long mCurrentPosition;
+
+    private RecipeStep mRecipeStep;
+    private SimpleExoPlayerView mExoPlayerView;
+    private SimpleExoPlayer mExoPlayer;
+
+    private static final String AUTO_PLAY = "auto_play";
+    private static final String CURRENT_WINDOW_INDEX = "current_window_index";
+    private static final String CURRENT_POSITION = "current_position";
 
     @Nullable
     @Override
@@ -42,50 +50,107 @@ public class RecipeStepDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_recipe_step_detail,
                 container, false);
 
-        RecipeStep recipeStep = getArguments().getParcelable(RecipeStepsAdapter.SELECTED_RECIPE_STEP);
+        if (getArguments() != null) {
+            mRecipeStep = getArguments().getParcelable(RecipeStepsAdapter.SELECTED_RECIPE_STEP);
+        }
 
-        SimpleExoPlayerView exoPlayerViewRecipeStep = rootView.findViewById(R.id.exo_player_recipe_step);
+        mExoPlayerView = rootView.findViewById(R.id.exo_player_recipe_step);
 
         // Text view is only available in portrait mode
-        TextView tvRecipeStepInstruction = null;
+        TextView tvRecipeStepInstruction;
         tvRecipeStepInstruction = rootView.findViewById(R.id.tv_recipe_step_instruction);
 
+        // set Recipe Step Instruction (only applicable in portrait mode)
+        if (tvRecipeStepInstruction != null) {
+            tvRecipeStepInstruction.setText(mRecipeStep.getDescription());
+        }
+
+        if (savedInstanceState != null) {
+            mAutoPlay = savedInstanceState.getBoolean(AUTO_PLAY, false);
+            mCurrentWindowIndex = savedInstanceState.getInt(CURRENT_WINDOW_INDEX, 0);
+            mCurrentPosition = savedInstanceState.getLong(CURRENT_POSITION, 0);
+        }
+
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initializeExoPlayer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializeExoPlayer();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        releaseExoPlayer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        releaseExoPlayer();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mExoPlayer != null) {
+            outState.putBoolean(AUTO_PLAY, mAutoPlay);
+            outState.putInt(CURRENT_WINDOW_INDEX, mCurrentWindowIndex);
+            outState.putLong(CURRENT_POSITION, mCurrentPosition);
+        }
+    }
+
+    private void initializeExoPlayer() {
         // get the required data
-        String recipeThumbnailUrl = recipeStep.getThumbnailUrl();
-        String videoUrl = recipeStep.getVideoUrl();
+        String recipeThumbnailUrl = mRecipeStep.getThumbnailUrl();
+        String videoUrl = mRecipeStep.getVideoUrl();
 
         if (videoUrl.isEmpty()) {
             videoUrl = recipeThumbnailUrl;
         }
 
-        // set Recipe Step Instruction (only applicable in portrait mode)
-        if (tvRecipeStepInstruction != null) {
-            tvRecipeStepInstruction.setText(recipeStep.getDescription());
-        }
-
         // Setup Simple Exo player
         TrackSelector trackSelector = new DefaultTrackSelector(
                 new AdaptiveVideoTrackSelection.Factory(new DefaultBandwidthMeter()));
-        SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(
-                getActivity(), trackSelector, new DefaultLoadControl());
+        mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(),
+                trackSelector, new DefaultLoadControl());
 
         // Set exo player to view
-        exoPlayerViewRecipeStep.setPlayer(exoPlayer);
+        mExoPlayerView.setPlayer(mExoPlayer);
+        mExoPlayer.setPlayWhenReady(mAutoPlay);
+
+        mExoPlayer.seekTo(mCurrentWindowIndex, mCurrentPosition);
 
         // Prepare source and player
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 getActivity(),
                 Util.getUserAgent(getActivity(), "Baking Time"),
-                bandwidthMeter);
+                new DefaultBandwidthMeter());
         MediaSource videoSource = new ExtractorMediaSource(
                 Uri.parse(videoUrl),
                 dataSourceFactory,
                 new DefaultExtractorsFactory(),
                 null,
                 null);
-        exoPlayer.prepare(videoSource);
+        mExoPlayer.prepare(videoSource);
+    }
 
-        return rootView;
+    private void releaseExoPlayer() {
+        if (mExoPlayer != null) {
+            mAutoPlay = mExoPlayer.getPlayWhenReady();
+            mCurrentWindowIndex = mExoPlayer.getCurrentWindowIndex();
+            mCurrentPosition = mExoPlayer.getCurrentPosition();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 }

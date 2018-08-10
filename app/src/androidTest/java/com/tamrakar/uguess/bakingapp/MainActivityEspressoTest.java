@@ -12,11 +12,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
@@ -61,5 +64,12 @@ public class MainActivityEspressoTest {
     @Test
     public void testRecyclerViewHasItem_withTextCheesecake() {
         onView(withText(CHEESECAKE)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void clickRecyclerViewItemPositionZero_checkTextMatches() {
+        onView(ViewMatchers.withId(R.id.rv_recipes)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        testRecyclerViewHasItem_withTextNutellaPie();
     }
 }

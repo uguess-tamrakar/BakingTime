@@ -18,13 +18,15 @@ import java.util.List;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHolder> {
 
+    private boolean mIsPhone;
     private static final String SELECTED_RECIPE = "selected_recipe";
     private Context mContext;
     private List<Recipe> mRecipes;
 
-    public RecipesAdapter(Context context, List<Recipe> recipes) {
+    public RecipesAdapter(Context context, List<Recipe> recipes, boolean isPhone) {
         mContext = context;
         mRecipes = recipes;
+        mIsPhone = isPhone;
     }
 
     @NonNull
@@ -45,6 +47,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, RecipeDetailActivity.class);
                 intent.putExtra(SELECTED_RECIPE, recipe);
+                intent.putExtra(RecipeDetailActivity.IS_PHONE, mIsPhone);
                 BakingAppWidgetIntentService.updateWidgets(mContext, recipe);
                 mContext.startActivity(intent);
             }

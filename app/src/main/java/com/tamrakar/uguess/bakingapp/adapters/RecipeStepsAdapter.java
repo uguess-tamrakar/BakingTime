@@ -21,14 +21,14 @@ import java.util.List;
 public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.ViewHolder> {
 
     public static String SELECTED_RECIPE_STEP = "selected_recipe_step";
-    private boolean mTwoPane;
+    private boolean mIsPhone;
     private Context mContext;
     private List<RecipeStep> mRecipeSteps;
 
-    public RecipeStepsAdapter(Context context, List<RecipeStep> recipeSteps, boolean isTwoPane) {
+    public RecipeStepsAdapter(Context context, List<RecipeStep> recipeSteps, boolean isPhone) {
         mContext = context;
         mRecipeSteps = recipeSteps;
-        mTwoPane = isTwoPane;
+        mIsPhone = isPhone;
     }
 
     @NonNull
@@ -53,7 +53,11 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTwoPane) {
+                if (mIsPhone) {
+                    Intent intent = new Intent(mContext, RecipeStepDetailActivity.class);
+                    intent.putExtra(SELECTED_RECIPE_STEP, recipeStep);
+                    mContext.startActivity(intent);
+                } else {
                     Bundle bundle = new Bundle();
                     bundle.putParcelable(SELECTED_RECIPE_STEP, recipeStep);
                     RecipeStepDetailFragment fragment = new RecipeStepDetailFragment();
@@ -63,10 +67,6 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
                             .beginTransaction()
                             .replace(R.id.recipe_detail_container, fragment)
                             .commit();
-                } else {
-                    Intent intent = new Intent(mContext, RecipeStepDetailActivity.class);
-                    intent.putExtra(SELECTED_RECIPE_STEP, recipeStep);
-                    mContext.startActivity(intent);
                 }
             }
         });
